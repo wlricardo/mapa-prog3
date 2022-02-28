@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
-import exceptions.NumeroDeHospedesExeception;
+import exceptions.ValorInvalidoExeception;
 
 public class Reserva {
 
@@ -13,7 +13,6 @@ public class Reserva {
 	private Integer qtdPessoas;
 	private Integer qtdDias;
 
-	// private List<ArrayList<Hospede>> listaDeHospedesPorSuite = new ArrayList<>();
 	private List<Hospede> hospedesDaSuite = new ArrayList<>();
 	private HashMap<Suite, List<Hospede>> listaDeHospedesPorSuite = new HashMap<>();
 
@@ -40,7 +39,12 @@ public class Reserva {
 		return qtdPessoas;
 	}
 
-	public void setQtdPessoas(Integer qtdPessoas) {
+	public void setQtdPessoas(Integer qtdPessoas) throws ValorInvalidoExeception {
+		/*
+		 * if (qtdPessoas == 0) { throw new
+		 * ValorInvalidoExeception("\n ** Erro! Quantidade de hóspedes não pode ser nula **\n"
+		 * ); }
+		 */
 		this.qtdPessoas = qtdPessoas;
 	}
 
@@ -94,9 +98,9 @@ public class Reserva {
 		return false;
 	}
 
-	public boolean validarReserva(Suite suite, List<Hospede> hospedes) {
+	public boolean validarReserva(Suite suite, List<Hospede> hospedes) throws ValorInvalidoExeception {
 		if (!verificarCapacidade(suite, hospedes)) {
-			throw new NumeroDeHospedesExeception("Quantidade de hóspedes acima da capacidade permitida");
+			throw new ValorInvalidoExeception("Quantidade de hóspedes acima da capacidade permitida");
 		} else {
 			listaDeHospedesPorSuite.put(suite, hospedes);
 		}
