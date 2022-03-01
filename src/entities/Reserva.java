@@ -81,34 +81,28 @@ public class Reserva {
 		return Objects.equals(hospedesDaSuite, other.hospedesDaSuite) && Objects.equals(suite, other.suite);
 	}
 
-	public int qtdDeHospedesMaioresDoisAnos(List<Hospede> hospedes) {
-		int quantidade = 0;
-		for (Hospede h : hospedes) {
-			if (h.getIdade() > 2) {
-				quantidade++;
-			}
-		}
-		return quantidade;
-	}
+	/*
+	 * public int qtdDeHospedesMaioresDoisAnos(List<Hospede> hospedes) { int
+	 * quantidade = 0; for (Hospede h : hospedes) { if (h.getIdade() > 2) {
+	 * quantidade++; } } return quantidade; }
+	 * 
+	 * public boolean verificarCapacidade(Suite suite, List<Hospede> hospedes) { if
+	 * (suite.getCapacidade() >= qtdDeHospedesMaioresDoisAnos(hospedes)) { return
+	 * true; } return false; }
+	 */
 
-	public boolean verificarCapacidade(Suite suite, List<Hospede> hospedes) {
-		if (suite.getCapacidade() >= qtdDeHospedesMaioresDoisAnos(hospedes)) {
-			return true;
-		}
-		return false;
-	}
-
-	public boolean validarReserva(Suite suite, List<Hospede> hospedes) throws ValorInvalidoExeception {
-		if (!verificarCapacidade(suite, hospedes)) {
-			throw new ValorInvalidoExeception("Quantidade de hóspedes acima da capacidade permitida");
-		} else {
-			listaDeHospedesPorSuite.put(suite, hospedes);
-		}
-		return true;
+	public void validarReserva(Suite suite, List<Hospede> hospedes) throws ValorInvalidoExeception {
+		/*
+		 * if (!verificarCapacidade(suite, hospedes)) { throw new
+		 * ValorInvalidoExeception(
+		 * "\n   ** Erro! Quantidade de hóspedes acima da capacidade permitida **\n"); }
+		 * else { listaDeHospedesPorSuite.put(suite, hospedes); } return true;
+		 */
+		listaDeHospedesPorSuite.put(suite, hospedes);
 	}
 
 	public void imprimirReservas() {
-		System.out.println("\nLISTA DE RESERVAS:\n");
+		System.out.println("\nLISTA DE RESERVAS:");
 		for (Suite s : listaDeHospedesPorSuite.keySet()) {
 			System.out.println("-------------------------");
 			System.out.println("  Hóspedes da suite #" + s.getNumero() + "\n");
@@ -116,13 +110,15 @@ public class Reserva {
 			for (Hospede hospede : listaDeHospedesPorSuite.get(s)) {
 				System.out.println(hospede);
 			}
+			System.out.println("   Total de diárias: " + this.getQtdDias());
+			System.out.println("   Valor da estadia: R$ " + this.calcularDiaria(s));
 		}
 	}
 
 	public double calcularDiaria(Suite suite) {
-		if (this.qtdDias > 7) {
-			return 0.8 * (suite.getValorDiaria() * this.qtdDias);
+		if (this.getQtdDias() > 7) {
+			return 0.9 * (suite.getValorDiaria() * this.getQtdDias());
 		}
-		return suite.getValorDiaria() * this.qtdDias;
+		return suite.getValorDiaria() * this.getQtdDias();
 	}
 }

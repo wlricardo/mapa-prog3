@@ -1,7 +1,12 @@
 package dialogs;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Scanner;
 
+import entities.Hospede;
+import entities.Suite;
+import exceptions.ReservasExceptions;
 import exceptions.ValorInvalidoExeception;
 
 public abstract class Mensagem {
@@ -69,17 +74,22 @@ public abstract class Mensagem {
 		System.out.print(" -Idade: ");
 		int idade = new Scanner(System.in).nextInt();
 		if (idade == 0) {
-			throw new ValorInvalidoExeception("\n   ** A idade do hóspede nãopode ser nula. Tente novamente **\n");
+			throw new ValorInvalidoExeception("\n   ** A idade do hóspede não pode ser nula. Tente novamente **\n");
 		}
 		return idade;
 	}
 
 	@SuppressWarnings("resource")
-	public static int numeroSuite() throws ValorInvalidoExeception {
+	public static int numeroSuite(HashMap<Suite, List<Hospede>> lista)
+			throws ValorInvalidoExeception, ReservasExceptions {
 		System.out.print(" -Número da suite: ");
 		int numero = new Scanner(System.in).nextInt();
 		if (numero == 0) {
 			throw new ValorInvalidoExeception("\n   ** O número da suite não pode ser nulo. Tente novamente **\n");
+		}
+		for (Suite s : lista.keySet()) {
+			if (s.getNumero().equals(numero)) {
+				throw new ReservasExceptions("\n   ** Erro! Esta suite já foi reservada. Tente novamente **\n");			}
 		}
 		return numero;
 	}
@@ -91,11 +101,20 @@ public abstract class Mensagem {
 	}
 
 	@SuppressWarnings("resource")
-	public static int capacidadeDaSuite() throws ValorInvalidoExeception {
+	public static int capacidadeDaSuite(List<Hospede> lista) throws ValorInvalidoExeception, ReservasExceptions {
+		int total = 0;
+		for (Hospede h : lista) {
+			if (h.getIdade() > 2) {
+				total++;
+			}
+		}
 		System.out.print(" -Capacidade da suíte: ");
 		int capacidade = new Scanner(System.in).nextInt();
 		if (capacidade == 0) {
 			throw new ValorInvalidoExeception("\n   ** A capacidade da suite não pode ser nula. Tente novamente **\n");
+		}
+		if (capacidade < total) {
+			throw new ReservasExceptions("\n   ** A capacidade da suite não suporta o número de hóspedes **\n");
 		}
 		return capacidade;
 	}
@@ -115,7 +134,7 @@ public abstract class Mensagem {
 		System.out.print(" -Quantidade de diária: ");
 		int diarias = new Scanner(System.in).nextInt();
 		if (diarias == 0) {
-			throw new ValorInvalidoExeception("   ** O númedo de diárias não pode ser nulo. Tente novamente **\n");
+			throw new ValorInvalidoExeception("\n   ** O númedo de diárias não pode ser nulo. Tente novamente **\n");
 		}
 		return diarias;
 	}

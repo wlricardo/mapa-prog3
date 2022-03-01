@@ -10,6 +10,7 @@ import dialogs.Mensagem;
 import entities.Hospede;
 import entities.Reserva;
 import entities.Suite;
+import exceptions.ReservasExceptions;
 import exceptions.ValorInvalidoExeception;
 
 public class Program {
@@ -18,16 +19,17 @@ public class Program {
 
 		Locale.setDefault(Locale.US);
 		Scanner sc = new Scanner(System.in);
-		Reserva reservas = new Reserva();
+		Reserva reserva = new Reserva();
+		double valorTotalDasHospedagens = 0;
 
 		do {
 			List<Hospede> lista = new ArrayList<Hospede>();
 			Hospede hospede = null;
 			Suite suite = null;
 			int numeroDeHospedes = 0;
-			
+
 			Mensagem.telaInicial();
-			
+
 			do {
 				try {
 					/* Verificação do número de hóspedes */
@@ -94,43 +96,52 @@ public class Program {
 			// INSERIR DADOS DA SUITE
 			Mensagem.reservarSuite();
 
-			/* Verificando número da suite */
 			int numero;
-			do {
-				try {
-					numero = Mensagem.numeroSuite();
-					break;
-				} catch (InputMismatchException e) {
-					System.out.println("\n   ** Erro ! Informe apenas valores numéricos **\n");
-				} catch (ValorInvalidoExeception e) {
-					System.out.println(e.getMessage());
-				}
-			} while (true);
-
-			String tipo = Mensagem.tipoDeSuite();
-
-			/* Verificar capacidade da suite */
+			String tipo;
 			int capacidade;
-			do {
-				try {
-					capacidade = Mensagem.capacidadeDaSuite();
-					break;
-				} catch (InputMismatchException e) {
-					System.out.println("\n   ** Erro ! Informe apenas valores numéricos **\n");
-				} catch (ValorInvalidoExeception e) {
-					System.out.println(e.getMessage());
-				}
-			} while (true);
-
-			/* Verificar valor da suite */
 			double valor;
+
 			do {
 				try {
-					valor = Mensagem.valorDaDiaria();
+					/* Verificando número da suite */
+					do {
+						try {
+							numero = Mensagem.numeroSuite(reserva.getListaDeHospedesPorSuite());
+							break;
+						} catch (InputMismatchException e) {
+							System.out.println("\n   ** Erro ! Informe apenas valores numéricos **\n");
+						} catch (ValorInvalidoExeception e) {
+							System.out.println(e.getMessage());
+						}
+					} while (true);
+
+					tipo = Mensagem.tipoDeSuite();
+
+					/* Verificar capacidade da suite */
+					do {
+						try {
+							capacidade = Mensagem.capacidadeDaSuite(lista);
+							break;
+						} catch (InputMismatchException e) {
+							System.out.println("\n   ** Erro ! Informe apenas valores numéricos **\n");
+						} catch (ValorInvalidoExeception e) {
+							System.out.println(e.getMessage());
+						}
+					} while (true);
+
+					/* Verificar valor da suite */
+					do {
+						try {
+							valor = Mensagem.valorDaDiaria();
+							break;
+						} catch (InputMismatchException e) {
+							System.out.println("\n   ** Erro ! Informe apenas valores numéricos **\n");
+						} catch (ValorInvalidoExeception e) {
+							System.out.println(e.getMessage());
+						}
+					} while (true);
 					break;
-				} catch (InputMismatchException e) {
-					System.out.println("\n   ** Erro ! Informe apenas valores numéricos **\n");
-				} catch (ValorInvalidoExeception e) {
+				} catch (ReservasExceptions e) {
 					System.out.println(e.getMessage());
 				}
 			} while (true);
@@ -138,35 +149,44 @@ public class Program {
 			/* Cadastrando suite */
 			suite = new Suite(numero, tipo, capacidade, valor);
 
-			if (reservas.validarReserva(suite, lista)) {
-				reservas.setQtdPessoas(numeroDeHospedes);
-				reservas.setSuite(suite);
-				/* Verificar número de diárias */
-				do {
-					try {
-						reservas.setQtdDias(Mensagem.quantidadeDeDiarias());
-						break;
-					} catch (InputMismatchException e) {
-						System.out.println("\n   ** Erro ! Informe apenas valores numéricos **\n");
-					} catch (ValorInvalidoExeception e) {
-						System.out.println(e.getMessage());
-					}
-				} while (true);
-				
-				Mensagem.sucessoReserva();
-				
-				System.out.println("   HÓSPEDES");
-				System.out.println("   --------");
-				for (Hospede h : lista) {
-					System.out.println(h);
+			/* Adicionando reserva efetuada à lista de hóspedes por suite */
+			reserva.validarReserva(suite, lista);
+			reserva.setQtdPessoas(numeroDeHospedes);
+			reserva.setSuite(suite);
+
+			/* Verificar número de diárias */
+			do {
+				try {
+					reserva.setQtdDias(Mensagem.quantidadeDeDiarias());
+					break;
+				} catch (InputMismatchException e) {
+					System.out.println("\n   ** Erro ! Informe apenas valores numéricos **\n");
+				} catch (ValorInvalidoExeception e) {
+					System.out.println(e.getMessage());
 				}
-				System.out.println("   SUÍTE");
-				System.out.println("   -----");
-				System.out.println(suite);
+			} while (true);
+
+			Mensagem.sucessoReserva();
+
+			System.out.println("   HÓSPEDES");
+			System.out.println("   --------");
+			for (Hospede h : lista) {
+				System.out.println(h);
 			}
+			System.out.println("   SUÍTE");
+			System.out.println("   -----");
+			System.out.println(suite);
+
+			System.out.println("   VALOR DA ESTADIA");
+			System.out.println("   ----------------");
+			System.out.println("   Total de diárias: " + reserva.getQtdDias());
+			System.out.println("   R$ " + reserva.calcularDiaria(suite));
+			valorTotalDasHospedagens += reserva.calcularDiaria(suite);
 
 		} while (Mensagem.novaReserva().toUpperCase().equals("S"));
-		reservas.imprimirReservas();
+		reserva.imprimirReservas();
+		System.out.println("---------------------------------");
+		System.out.println("VALOR TOTAL DAS ESTADIAS: R$ " + valorTotalDasHospedagens);
 		sc.close();
 	}
 }

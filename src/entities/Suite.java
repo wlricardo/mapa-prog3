@@ -71,7 +71,7 @@ public class Suite {
 	@Override
 	public String toString() {
 		return "   Suite #: " + numero 
-				+ "\n   Tipo de suíte: " + tipo 
+				+ "\n   Tipo de suíte: " + tipo.toUpperCase() 
 				+ "\n   Capacidade: " + capacidade + " hóspedes" 
 				+ "\n   Valor da diária: R$ " + valorDiaria 
 				+ "\n";
